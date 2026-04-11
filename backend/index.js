@@ -51,6 +51,32 @@ app.get('/prestamos', (req, res) => {
 })
 
 const PORT = process.env.PORT || 3000
+app.post('/socios', (req, res) => {
+  const { nombre, email, telefono } = req.body
+  const query = 'INSERT INTO socios (nombre, email, telefono) VALUES (?, ?, ?)'
+  db.query(query, [nombre, email, telefono], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message })
+    res.json({ mensaje: 'Socio creado', id: result.insertId })
+  })
+})
+
+app.post('/libros', (req, res) => {
+  const { titulo, autor, genero, cantidad_disponible } = req.body
+  const query = 'INSERT INTO libros (titulo, autor, genero, cantidad_disponible) VALUES (?, ?, ?, ?)'
+  db.query(query, [titulo, autor, genero, cantidad_disponible], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message })
+    res.json({ mensaje: 'Libro creado', id: result.insertId })
+  })
+})
+
+app.post('/prestamos', (req, res) => {
+  const { socio_id, libro_id, fecha_devolucion } = req.body
+  const query = 'INSERT INTO prestamos (socio_id, libro_id, fecha_devolucion) VALUES (?, ?, ?)'
+  db.query(query, [socio_id, libro_id, fecha_devolucion], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message })
+    res.json({ mensaje: 'Prestamo creado', id: result.insertId })
+  })
+})
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
 })
