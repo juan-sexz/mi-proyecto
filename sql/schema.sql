@@ -18,8 +18,8 @@ CREATE TABLE prestamos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     socio_id INT,
     libro_id INT,
-    fecha_prestamo DATE DEFAULT (CURRENT_DATE),
-    fecha_devolucion DATE,
+   <td>{formatFecha(p.fecha_prestamo)}</td>
+<td>{formatFecha(p.fecha_devolucion)}</td>
     estado VARCHAR(20) DEFAULT 'activo',
     FOREIGN KEY (socio_id) REFERENCES socios(id),
     FOREIGN KEY (libro_id) REFERENCES libros(id)
