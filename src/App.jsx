@@ -6,6 +6,8 @@ function App() {
   const [prestamos, setPrestamos] = useState([])
   const [nuevoSocio, setNuevoSocio] = useState({ nombre: '', email: '', telefono: '' })
   const [nuevoLibro, setNuevoLibro] = useState({ titulo: '', autor: '', genero: '', cantidad_disponible: 1 })
+  const [editandoSocio, setEditandoSocio] = useState(null)
+  const [editandoLibro, setEditandoLibro] = useState(null)
   const [mensaje, setMensaje] = useState('')
 
   const cargarDatos = () => {
@@ -21,18 +23,21 @@ function App() {
     return new Date(fecha).toLocaleDateString('es-CO')
   }
 
+  const mostrarMensaje = (msg) => {
+    setMensaje(msg)
+    setTimeout(() => setMensaje(''), 3000)
+  }
+
   const agregarSocio = () => {
     fetch('http://localhost:3000/socios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(nuevoSocio)
+    }).then(() => {
+      mostrarMensaje('Socio agregado correctamente')
+      setNuevoSocio({ nombre: '', email: '', telefono: '' })
+      cargarDatos()
     })
-      .then(r => r.json())
-      .then(() => {
-        setMensaje('Socio agregado correctamente')
-        setNuevoSocio({ nombre: '', email: '', telefono: '' })
-        cargarDatos()
-      })
   }
 
   const agregarLibro = () => {
@@ -40,13 +45,35 @@ function App() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(nuevoLibro)
+    }).then(() => {
+      mostrarMensaje('Libro agregado correctamente')
+      setNuevoLibro({ titulo: '', autor: '', genero: '', cantidad_disponible: 1 })
+      cargarDatos()
     })
-      .then(r => r.json())
-      .then(() => {
-        setMensaje('Libro agregado correctamente')
-        setNuevoLibro({ titulo: '', autor: '', genero: '', cantidad_disponible: 1 })
-        cargarDatos()
-      })
+  }
+
+  const actualizarSocio = () => {
+    fetch(`http://localhost:3000/socios/${editandoSocio.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editandoSocio)
+    }).then(() => {
+      mostrarMensaje('Socio actualizado correctamente')
+      setEditandoSocio(null)
+      cargarDatos()
+    })
+  }
+
+  const actualizarLibro = () => {
+    fetch(`http://localhost:3000/libros/${editandoLibro.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editandoLibro)
+    }).then(() => {
+      mostrarMensaje('Libro actualizado correctamente')
+      setEditandoLibro(null)
+      cargarDatos()
+    })
   }
 
   return (
@@ -66,15 +93,34 @@ function App() {
         <button onClick={agregarSocio}>Agregar</button>
       </div>
 
+      {editandoSocio && (
+        <div style={{ background: '#f0f0f0', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
+          <h3>Editando socio</h3>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input value={editandoSocio.nombre}
+              onChange={e => setEditandoSocio({ ...editandoSocio, nombre: e.target.value })} />
+            <input value={editandoSocio.email}
+              onChange={e => setEditandoSocio({ ...editandoSocio, email: e.target.value })} />
+            <input value={editandoSocio.telefono}
+              onChange={e => setEditandoSocio({ ...editandoSocio, telefono: e.target.value })} />
+            <button onClick={actualizarSocio}>Guardar</button>
+            <button onClick={() => setEditandoSocio(null)}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
       <h2>Socios</h2>
       <table border="1" cellPadding="8" style={{ marginBottom: '2rem' }}>
         <thead>
-          <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th></tr>
+          <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Acciones</th></tr>
         </thead>
         <tbody>
           {socios.map(s => (
             <tr key={s.id}>
               <td>{s.id}</td><td>{s.nombre}</td><td>{s.email}</td><td>{s.telefono}</td>
+              <td>
+                <button onClick={() => setEditandoSocio({ ...s, id: Number(s.id) })}>Editar</button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -88,21 +134,42 @@ function App() {
           onChange={e => setNuevoLibro({ ...nuevoLibro, autor: e.target.value })} />
         <input placeholder="Género" value={nuevoLibro.genero}
           onChange={e => setNuevoLibro({ ...nuevoLibro, genero: e.target.value })} />
-        <input type="number" placeholder="Cantidad" value={nuevoLibro.cantidad_disponible}
+        <input type="number" value={nuevoLibro.cantidad_disponible}
           onChange={e => setNuevoLibro({ ...nuevoLibro, cantidad_disponible: e.target.value })} />
         <button onClick={agregarLibro}>Agregar</button>
       </div>
 
+      {editandoLibro && (
+        <div style={{ background: '#f0f0f0', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
+          <h3>Editando libro</h3>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input value={editandoLibro.titulo}
+              onChange={e => setEditandoLibro({ ...editandoLibro, titulo: e.target.value })} />
+            <input value={editandoLibro.autor}
+              onChange={e => setEditandoLibro({ ...editandoLibro, autor: e.target.value })} />
+            <input value={editandoLibro.genero}
+              onChange={e => setEditandoLibro({ ...editandoLibro, genero: e.target.value })} />
+            <input type="number" value={editandoLibro.cantidad_disponible}
+              onChange={e => setEditandoLibro({ ...editandoLibro, cantidad_disponible: e.target.value })} />
+            <button onClick={actualizarLibro}>Guardar</button>
+            <button onClick={() => setEditandoLibro(null)}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
       <h2>Libros</h2>
       <table border="1" cellPadding="8" style={{ marginBottom: '2rem' }}>
         <thead>
-          <tr><th>ID</th><th>Título</th><th>Autor</th><th>Género</th><th>Disponibles</th></tr>
+          <tr><th>ID</th><th>Título</th><th>Autor</th><th>Género</th><th>Disponibles</th><th>Acciones</th></tr>
         </thead>
         <tbody>
           {libros.map(l => (
             <tr key={l.id}>
               <td>{l.id}</td><td>{l.titulo}</td><td>{l.autor}</td>
               <td>{l.genero}</td><td>{l.cantidad_disponible}</td>
+              <td>
+                <button onClick={() => setEditandoLibro({ ...l, id: Number(l.id) })}>Editar</button>
+              </td>
             </tr>
           ))}
         </tbody>
