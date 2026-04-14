@@ -95,6 +95,21 @@ app.put('/libros/:id', (req, res) => {
 })
 
 const PORT = process.env.PORT || 3000
+app.delete('/socios/:id', (req, res) => {
+  const id = req.params.id
+  db.query('DELETE FROM socios WHERE id=?', [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message })
+    res.json({ mensaje: 'Socio eliminado' })
+  })
+})
+
+app.delete('/libros/:id', (req, res) => {
+  const id = req.params.id
+  db.query('DELETE FROM libros WHERE id=?', [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message })
+    res.json({ mensaje: 'Libro eliminado' })
+  })
+})
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
 })

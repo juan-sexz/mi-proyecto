@@ -76,6 +76,24 @@ function App() {
     })
   }
 
+  const eliminarSocio = (id) => {
+    if (!window.confirm('¿Estás seguro de eliminar este socio?')) return
+    fetch(`http://localhost:3000/socios/${id}`, { method: 'DELETE' })
+      .then(() => {
+        mostrarMensaje('Socio eliminado correctamente')
+        cargarDatos()
+      })
+  }
+
+  const eliminarLibro = (id) => {
+    if (!window.confirm('¿Estás seguro de eliminar este libro?')) return
+    fetch(`http://localhost:3000/libros/${id}`, { method: 'DELETE' })
+      .then(() => {
+        mostrarMensaje('Libro eliminado correctamente')
+        cargarDatos()
+      })
+  }
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Biblioteca</h1>
@@ -118,8 +136,10 @@ function App() {
           {socios.map(s => (
             <tr key={s.id}>
               <td>{s.id}</td><td>{s.nombre}</td><td>{s.email}</td><td>{s.telefono}</td>
-              <td>
+              <td style={{ display: 'flex', gap: '4px' }}>
                 <button onClick={() => setEditandoSocio({ ...s, id: Number(s.id) })}>Editar</button>
+                <button onClick={() => eliminarSocio(Number(s.id))}
+                  style={{ background: 'red', color: 'white' }}>Eliminar</button>
               </td>
             </tr>
           ))}
@@ -167,8 +187,10 @@ function App() {
             <tr key={l.id}>
               <td>{l.id}</td><td>{l.titulo}</td><td>{l.autor}</td>
               <td>{l.genero}</td><td>{l.cantidad_disponible}</td>
-              <td>
+              <td style={{ display: 'flex', gap: '4px' }}>
                 <button onClick={() => setEditandoLibro({ ...l, id: Number(l.id) })}>Editar</button>
+                <button onClick={() => eliminarLibro(Number(l.id))}
+                  style={{ background: 'red', color: 'white' }}>Eliminar</button>
               </td>
             </tr>
           ))}
