@@ -9,6 +9,8 @@ function App() {
   const [editandoSocio, setEditandoSocio] = useState(null)
   const [editandoLibro, setEditandoLibro] = useState(null)
   const [mensaje, setMensaje] = useState('')
+  const [buscarSocio, setBuscarSocio] = useState('')
+  const [buscarLibro, setBuscarLibro] = useState('')
 
   const cargarDatos = () => {
     fetch('http://localhost:3000/socios').then(r => r.json()).then(setSocios)
@@ -94,6 +96,15 @@ function App() {
       })
   }
 
+  const filtrarSocios = socios.filter(s =>
+    s.nombre.toLowerCase().includes(buscarSocio.toLowerCase())
+  )
+
+  const filtrarLibros = libros.filter(l =>
+    l.titulo.toLowerCase().includes(buscarLibro.toLowerCase()) ||
+    l.genero.toLowerCase().includes(buscarLibro.toLowerCase())
+  )
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Biblioteca</h1>
@@ -128,12 +139,18 @@ function App() {
       )}
 
       <h2>Socios</h2>
+      <input
+        placeholder="Buscar socio por nombre..."
+        value={buscarSocio}
+        onChange={e => setBuscarSocio(e.target.value)}
+        style={{ marginBottom: '0.5rem', padding: '6px', width: '300px' }}
+      />
       <table border="1" cellPadding="8" style={{ marginBottom: '2rem' }}>
         <thead>
           <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Acciones</th></tr>
         </thead>
         <tbody>
-          {socios.map(s => (
+          {filtrarSocios.map(s => (
             <tr key={s.id}>
               <td>{s.id}</td><td>{s.nombre}</td><td>{s.email}</td><td>{s.telefono}</td>
               <td style={{ display: 'flex', gap: '4px' }}>
@@ -178,12 +195,18 @@ function App() {
       )}
 
       <h2>Libros</h2>
+      <input
+        placeholder="Buscar libro por título o género..."
+        value={buscarLibro}
+        onChange={e => setBuscarLibro(e.target.value)}
+        style={{ marginBottom: '0.5rem', padding: '6px', width: '300px' }}
+      />
       <table border="1" cellPadding="8" style={{ marginBottom: '2rem' }}>
         <thead>
           <tr><th>ID</th><th>Título</th><th>Autor</th><th>Género</th><th>Disponibles</th><th>Acciones</th></tr>
         </thead>
         <tbody>
-          {libros.map(l => (
+          {filtrarLibros.map(l => (
             <tr key={l.id}>
               <td>{l.id}</td><td>{l.titulo}</td><td>{l.autor}</td>
               <td>{l.genero}</td><td>{l.cantidad_disponible}</td>

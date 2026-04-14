@@ -110,6 +110,23 @@ app.delete('/libros/:id', (req, res) => {
     res.json({ mensaje: 'Libro eliminado' })
   })
 })
+app.get('/socios/buscar', (req, res) => {
+  const { nombre } = req.query
+  db.query('SELECT * FROM socios WHERE nombre LIKE ?',
+    [`%${nombre}%`], (err, results) => {
+      if (err) return res.status(500).json({ error: err.message })
+      res.json(results)
+    })
+})
+
+app.get('/libros/buscar', (req, res) => {
+  const { titulo } = req.query
+  db.query('SELECT * FROM libros WHERE titulo LIKE ? OR genero LIKE ?',
+    [`%${titulo}%`, `%${titulo}%`], (err, results) => {
+      if (err) return res.status(500).json({ error: err.message })
+      res.json(results)
+    })
+})
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`)
 })
